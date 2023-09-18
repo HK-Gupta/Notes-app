@@ -1,7 +1,9 @@
 package com.example.notes;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +12,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class MainActivity extends AppCompatActivity {
 
     private EditText login_email;
@@ -17,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout login_btn;
     private RelativeLayout goto_signup_btn;
     private TextView goto_forgot_password;
+
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,19 +40,26 @@ public class MainActivity extends AppCompatActivity {
         goto_signup_btn = findViewById(R.id.goto_signup_btn);
         goto_forgot_password = findViewById(R.id.goto_forgot_password);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+
+        if(firebaseUser != null) {
+            finish();
+            callNextActivity(NotesActivity.class);
+        }
+
+
         goto_signup_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, SignUp.class);
-                startActivity(intent);
+                callNextActivity(SignUp.class);
             }
         });
 
         goto_forgot_password.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ForgotPassword.class);
-                startActivity(intent);
+                callNextActivity(ForgotPassword.class);
             }
         });
 
@@ -52,12 +69,43 @@ public class MainActivity extends AppCompatActivity {
                 String email = login_email.getText().toString().trim();
                 String password = login_password.getText().toString().trim();
                 if(email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Please Fill All the Fields", Toast.LENGTH_SHORT).show();
+                    displayToast("Please Fill All the Fields");
                 } else {
                     // Login the User if the Fields are correct.
+                    firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if(task.isSuccessful()) {
+                                checkMailVerification();
+                            } else {
+                                displayToast("Account Doesn't Exist.");
+                            }
+                        }
+                    });
 
                 }
             }
         });
+    }
+
+    private void checkMailVerification() {
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if(firebaseUser.isEmailVerified()) {
+            displayToast("Logged In");
+            finish();
+            callNextActivity(NotesActivity.class);
+        } else {
+            displayToast("Verify the Mail First");
+            firebaseAuth.signOut();
+        }
+    }
+
+    void displayToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    private void callNextActivity(Class<?> destinationActivity) {
+        Intent intent = new Intent(MainActivity.this, destinationActivity);
+        startActivity(intent);
     }
 }

@@ -20,21 +20,23 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_above="@+id/center_line"
-        android:layout_marginBottom="150dp"
+        android:layout_marginBottom="180dp"
         android:orientation="vertical">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Welcome Back !"
             android:textSize="40sp"
-            android:textColor="#FFBD4D"
-            android:textStyle="bold"/>
+            android:textColor="#36C2DB"
+            android:textStyle="bold"
+            android:padding="2dp"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Login To Continue"
-            android:textColor="#FFBD4D"
-            android:textSize="24sp"/>
+            android:textColor="#426CE7"
+            android:textSize="24sp"
+            android:padding="4dp"/>
             
     </LinearLayout>
 
@@ -46,7 +48,8 @@
         android:id="@+id/email"
         android:layout_marginRight="30dp"
         android:layout_marginLeft="30dp"
-        android:background="#dddddd">
+        android:background="#dddddd"
+        android:padding="2dp">
 
         <EditText
             android:layout_width="match_parent"
@@ -97,13 +100,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Forgot Password"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
         android:textColor="@color/black"
         android:layout_below="@+id/login_btn"
         android:layout_marginTop="20dp"
         android:textAlignment="center"
-        android:id="@+id/goto_forgot_password"/>
+        android:id="@+id/goto_forgot_password"
+        android:background="@drawable/text_design"
+        android:padding="7dp"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
