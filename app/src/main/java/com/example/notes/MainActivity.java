@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout login_btn;
     private RelativeLayout goto_signup_btn;
     private TextView goto_forgot_password;
+    private ProgressBar main_progressbar;
 
     private FirebaseAuth firebaseAuth;
 
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         login_btn = findViewById(R.id.login_btn);
         goto_signup_btn = findViewById(R.id.goto_signup_btn);
         goto_forgot_password = findViewById(R.id.goto_forgot_password);
+        main_progressbar = findViewById(R.id.main_progressbar);
 
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
@@ -72,12 +75,14 @@ public class MainActivity extends AppCompatActivity {
                     displayToast("Please Fill All the Fields");
                 } else {
                     // Login the User if the Fields are correct.
+                    main_progressbar.setVisibility(View.VISIBLE);
                     firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()) {
                                 checkMailVerification();
                             } else {
+                                main_progressbar.setVisibility(View.INVISIBLE);
                                 displayToast("Account Doesn't Exist.");
                             }
                         }
@@ -95,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
             callNextActivity(NotesActivity.class);
         } else {
+            main_progressbar.setVisibility(View.INVISIBLE);
             displayToast("Verify the Mail First");
             firebaseAuth.signOut();
         }

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ public class ForgotPassword extends AppCompatActivity {
     private TextView goto_login_password;
 
     private FirebaseAuth firebaseAuth;
+    private ProgressBar forgot_progressbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class ForgotPassword extends AppCompatActivity {
         forgot_password = findViewById(R.id.forgot_password);
         btn_password_recover = findViewById(R.id.btn_password_recover);
         goto_login_password = findViewById(R.id.goto_login_password);
+        forgot_progressbar = findViewById(R.id.forgot_progressbar);
 
         firebaseAuth = FirebaseAuth.getInstance();
         goto_login_password.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +55,7 @@ public class ForgotPassword extends AppCompatActivity {
                 }
                 else {
                     // Send Mail to recover Password.
+                    forgot_progressbar.setVisibility(View.VISIBLE);
                     firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
@@ -60,6 +64,7 @@ public class ForgotPassword extends AppCompatActivity {
                                 finish();
                                 callNextActivity(MainActivity.class);
                             } else {
+                                forgot_progressbar.setVisibility(View.INVISIBLE);
                                 displayToast("Account Doesn't Exist !");
                             }
                         }

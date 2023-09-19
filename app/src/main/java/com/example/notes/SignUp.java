@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,7 @@ public class SignUp extends AppCompatActivity {
     private EditText signup_password;
     private RelativeLayout signup_btn;
     private TextView goto_login;
+    private ProgressBar signup_progressbar;
 
     private FirebaseAuth firebaseAuth;
 
@@ -39,6 +41,7 @@ public class SignUp extends AppCompatActivity {
         signup_password = findViewById(R.id.signup_password);
         signup_btn = findViewById(R.id.signup_btn);
         goto_login = findViewById(R.id.goto_login);
+        signup_progressbar = findViewById(R.id.signup_progressbar);
 
         //This Variable is used for registering new user in the Database.
         firebaseAuth = FirebaseAuth.getInstance();
@@ -62,6 +65,7 @@ public class SignUp extends AppCompatActivity {
                     displayToast("Password Should Contain At Least 7 characters");
                 } else {
                     // Register the user to Fire Base. As all the fields are filled correctly.
+                    signup_progressbar.setVisibility(View.VISIBLE);
                     firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -70,6 +74,7 @@ public class SignUp extends AppCompatActivity {
                                 displayToast("Registration Successful");
                                 sendEmailVerification();
                             } else {
+                                signup_progressbar.setVisibility(View.INVISIBLE);
                                 displayToast("Failed To Register");
                             }
                         }
@@ -95,6 +100,7 @@ public class SignUp extends AppCompatActivity {
                 }
             });
         } else {
+            signup_progressbar.setVisibility(View.INVISIBLE);
             displayToast("Failed to Send Verification Email");
         }
     }

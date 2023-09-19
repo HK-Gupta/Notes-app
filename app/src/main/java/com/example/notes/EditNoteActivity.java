@@ -11,8 +11,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -24,69 +22,70 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CreateNote extends AppCompatActivity {
+public class EditNoteActivity extends AppCompatActivity {
 
-    EditText title_create_note;
-    EditText create_note_content;
-    FloatingActionButton save_notes;
+    Intent data;
+    EditText title_edit_note, edit_note_content;
+    FloatingActionButton save_edit_note;
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
     FirebaseFirestore firebaseFirestore;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_note);
+        setContentView(R.layout.activity_edit_note);
 
-        title_create_note = findViewById(R.id.title_create_note);
-        create_note_content = findViewById(R.id.create_note_content);
-        save_notes = findViewById(R.id.save_note);
+        title_edit_note = findViewById(R.id.title_edit_note);
+        edit_note_content = findViewById(R.id.edit_note_content);
+        save_edit_note = findViewById(R.id.save_edit_note);
 
-        Toolbar toolbar = findViewById(R.id.toolbar_create_note);
+        data = getIntent();
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        Toolbar toolbar = findViewById(R.id.toolbar_edit_note);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
-
-        save_notes.setOnClickListener(new View.OnClickListener() {
+        save_edit_note.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String title = title_create_note.getText().toString();
-                String content = create_note_content.getText().toString();
-
-                if(title.isEmpty() || content.isEmpty()) {
-                    displayToast("Both Fields are Required");
+                String newTitle = title_edit_note.getText().toString();
+                String newContent = edit_note_content.getText().toString();
+                if(newTitle.isEmpty() || newTitle.isEmpty()) {
+                    displayToast("Something is Empty.");
+                    return;
                 } else {
-                    // For storing the data.
-
-                    DocumentReference documentReference = firebaseFirestore
-                            .collection("notes")
+                    DocumentReference documentReference = firebaseFirestore.collection("notes")
                             .document(firebaseUser.getUid())
-                            .collection("myNotes").document();
-
+                            .collection("myNotes")
+                            .document(data.getStringExtra("noteId"));
                     Map<String, Object> note = new HashMap<>();
-                    note.put("title", title);
-                    note.put("content", content);
-
+                    note.put("title", newTitle);
+                    note.put("content", newContent);
                     documentReference.set(note).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            displayToast("Note added Successfully");
-                            callNextActivity(NotesActivity.class);
+                            displayToast("Note is Updated.");
+                            startActivity(new Intent(EditNoteActivity.this, NotesActivity.class));
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            displayToast("Failed To Create Note");
+                            displayToast("Failed To Update.");
                         }
                     });
-
                 }
             }
         });
+
+        String noteTitle = data.getStringExtra("title");
+        String noteContent = data.getStringExtra("content");
+
+        title_edit_note.setText(noteTitle);
+        edit_note_content.setText(noteContent);
 
     }
 
@@ -99,10 +98,5 @@ public class CreateNote extends AppCompatActivity {
     }
     void displayToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-    }
-
-    void callNextActivity(Class<?> destinationActivity)  {
-        Intent intent = new Intent(CreateNote.this, destinationActivity);
-        startActivity(intent);
     }
 }
