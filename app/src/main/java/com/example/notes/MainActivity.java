@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        main_progressbar.setVisibility(View.INVISIBLE);
 
         if(firebaseUser != null) {
             finish();
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                                 checkMailVerification();
                             } else {
                                 main_progressbar.setVisibility(View.INVISIBLE);
-                                displayToast("Account Doesn't Exist.");
+                                displayToast("Account Doesn't Exist Or Wrong Password");
                             }
                         }
                     });
